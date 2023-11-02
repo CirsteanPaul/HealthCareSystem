@@ -6,4 +6,13 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Healthcare.Domain\Healthcare.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Core\" />
+      <Folder Include="Test\Queries\" />
+    </ItemGroup>
+
 </Project>
