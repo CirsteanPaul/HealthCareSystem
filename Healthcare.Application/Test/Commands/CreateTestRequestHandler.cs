@@ -1,25 +1,32 @@
+using Healthcare.Application.Core.Abstractions.Data;
 using Healthcare.Application.Core.Abstractions.Messaging;
 using Healthcare.Domain.Shared;
 
 namespace Healthcare.Application.Test.Commands;
 
-public sealed class CreateTestRequestHandler : ICommandHandler<CreateTestRequestCommand>
+public sealed class CreateTestRequestHandler : ICommandHandler<CreateTestRequestCommand, CreateTestResponse>
 {
-    public CreateTestRequestHandler()
+    private readonly ITestRepository _repository;
+    public CreateTestRequestHandler(ITestRepository repository)
     {
+        _repository = repository;
     }
 
-    public async Task<Result> Handle(CreateTestRequestCommand command, CancellationToken cancellationToken)
+    public async Task<Result<CreateTestResponse>> Handle(CreateTestRequestCommand command, CancellationToken cancellationToken)
     {
         var newTest = new Domain.Test(Guid.NewGuid(), command.Name, command.Code);
 
-        await Task.Delay(100);
+        var result = await _repository.AddAsync(newTest);
 
-        return Result.Success(new CreateTestResponse
+        if (result.IsSuccess)
         {
-            Id = newTest.Id,
-            Name = newTest.Name,
-            Code = newTest.Code
-        });
+            return Result.Success<CreateTestResponse>(new CreateTestResponse()
+            {
+                Id = result.Value.Id,
+                Name = result.Value.Name,
+                Code = result.Value.Code
+            });
+        }
+        return Result.Failure<CreateTestResponse>(result.Error);
     }
 }

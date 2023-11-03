@@ -3,7 +3,7 @@ using Healthcare.Domain.Shared;
 
 namespace Healthcare.Application.Test.Commands;
 
-public sealed class CreateTestRequestCommand : ICommand<Result>
+public sealed class CreateTestRequestCommand : ICommand<CreateTestResponse>
 {
     public CreateTestRequestCommand(string name, int code)
     {
