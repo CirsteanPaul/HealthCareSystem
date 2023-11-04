@@ -1,10 +1,12 @@
 using Healthcare.Application;
 using Healthcare.Infrastructure;
+using WebApi.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddMappings();
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddApplication();
 

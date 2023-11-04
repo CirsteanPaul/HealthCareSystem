@@ -1,22 +1,26 @@
 using Healthcare.Application.Test.Commands;
 using Healthcare.Application.Test.Queries;
 using Healthcare.Domain.Shared;
+using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Contracts;
+using WebApi.Infrastructure;
 
 namespace WebApi.Controllers;
 
 public class TestController : ApiController
 {
-    public TestController(ISender sender) : base(sender)
+    private readonly IMapper _mapper;
+    public TestController(ISender sender, IMapper mapper) : base(sender)
     {
+        _mapper = mapper;
     }
 
     [HttpPost(ApiRoutes.Test.Create)]
-    public async Task<IActionResult> CreateTest()
+    public async Task<IActionResult> CreateTest(CreateTestRequest request)
     {
-        var command = new CreateTestRequestCommand("lala", 100);
+        var command = _mapper.Map<CreateTestRequestCommand>(request);
 
         var result = await Sender.Send(command);
 
