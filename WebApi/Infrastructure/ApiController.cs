@@ -1,8 +1,9 @@
 using Healthcare.Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Contracts;
 
-namespace WebApi.Contracts;
+namespace WebApi.Infrastructure;
 
 [ApiController]
 public class ApiController : ControllerBase
