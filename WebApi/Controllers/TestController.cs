@@ -20,20 +20,17 @@ public class TestController : ApiController
     [HttpPost(ApiRoutes.Test.Create)]
     public async Task<IActionResult> CreateTest(CreateTestRequest request)
     {
-        var command = _mapper.Map<CreateTestRequestCommand>(request);
-
-        var result = await Sender.Send(command);
-
-        return result.Match(Ok, BadRequest);
+        return (await Sender.Send(_mapper.Map<CreateTestRequestCommand>(request)))
+            .Match<CreateTestResponse, IActionResult>(Ok, HandleFailure);
     }
 
     [HttpGet(ApiRoutes.Test.Get)]
     public async Task<IActionResult> GetTests()
     {
         var query = new GetTestRequestQuery();
-
+        
         var result = await Sender.Send(query);
 
-        return result.Match(Ok, BadRequest);
+        return result.Match<GetTestResponse, IActionResult>(Ok, HandleFailure);
     }
 }
