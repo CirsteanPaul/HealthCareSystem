@@ -1,6 +1,7 @@
 using Healthcare.Application;
 using Healthcare.Infrastructure;
 using WebApi.Infrastructure;
+using WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCustomExceptionHandler();
 
 app.MapControllers();
 
