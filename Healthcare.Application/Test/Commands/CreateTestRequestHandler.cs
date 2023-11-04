@@ -14,7 +14,7 @@ public sealed class CreateTestRequestHandler : ICommandHandler<CreateTestRequest
 
     public async Task<Result<CreateTestResponse>> Handle(CreateTestRequestCommand command, CancellationToken cancellationToken)
     {
-        var newTest = new Domain.Test(Guid.NewGuid(), command.Name, command.Code);
+        var newTest = new Domain.Entities.Test(Guid.NewGuid(), command.Name, command.Code);
 
         var result = await _repository.AddAsync(newTest);
 

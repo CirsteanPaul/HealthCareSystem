@@ -1,6 +1,6 @@
 namespace Healthcare.Application.Core.Abstractions.Data;
 
-public interface ITestRepository : IAsyncRepository<Domain.Test>
+public interface ITestRepository : IAsyncRepository<Domain.Entities.Test>
 { 
-    Task<IReadOnlyList<Domain.Test>> GetAll(CancellationToken cancellationToken);
+    Task<IReadOnlyList<Domain.Entities.Test>> GetAll(CancellationToken cancellationToken);
 }

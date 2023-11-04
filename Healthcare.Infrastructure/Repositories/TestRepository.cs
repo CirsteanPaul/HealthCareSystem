@@ -1,5 +1,5 @@
 using Healthcare.Application.Core.Abstractions.Data;
-using Healthcare.Domain;
+using Healthcare.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Infrastructure.Repositories;

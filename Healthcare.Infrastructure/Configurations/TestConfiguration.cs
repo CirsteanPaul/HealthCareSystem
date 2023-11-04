@@ -1,10 +1,10 @@
-using Healthcare.Domain;
+using Healthcare.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Healthcare.Infrastructure.Configurations;
 
-public sealed class TestConfiguration : IEntityTypeConfiguration<Domain.Test>
+public sealed class TestConfiguration : IEntityTypeConfiguration<Test>
 {
     public void Configure(EntityTypeBuilder<Test> builder)
     {

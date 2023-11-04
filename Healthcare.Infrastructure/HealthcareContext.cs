@@ -1,5 +1,5 @@
 using System.Reflection;
-using Healthcare.Domain;
+using Healthcare.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Infrastructure;

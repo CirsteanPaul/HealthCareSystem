@@ -1,4 +1,4 @@
-﻿namespace Healthcare.Domain;
+﻿namespace Healthcare.Domain.Entities;
 
 public class Test
 {

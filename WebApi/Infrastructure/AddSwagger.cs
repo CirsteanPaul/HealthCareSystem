@@ -1,0 +1,67 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+
+namespace WebApi.Infrastructure;
+
+public static class AddSwagger
+{
+    public static IServiceCollection AddSwaggerProperties(this IServiceCollection services)
+        {
+            return services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Healthcare.Api", Version = "v1" });
+                c.AddSecurityDefinition(AuthorizationType.Bearer, new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    In = ParameterLocation.Header,
+                    Scheme = AuthorizationType.Bearer,
+                    Description = "Please insert the JWT token"
+                });
+                c.OperationFilter<BasicAuthOperationsFilter>();
+            });
+        }
+
+    /// <summary>
+    /// Marks routes annotated with [AllowAnonymous] attribute as being public. All other routes are marked as requiring authentication.
+    /// </summary>
+    private class BasicAuthOperationsFilter : IOperationFilter
+    {
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            var noAuthRequired = context.ApiDescription.CustomAttributes().Any(attr => attr.GetType() == typeof(AllowAnonymousAttribute));
+
+            if (noAuthRequired)
+            {
+                return;
+            }
+
+            operation.Security = new List<OpenApiSecurityRequirement>
+            {
+                new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Name = AuthorizationType.Bearer,
+                            In = ParameterLocation.Header,
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = AuthorizationType.Bearer
+                            },
+                        },
+                        new string[] { }
+                    }
+                }
+            };
+        }
+    }
+
+    private class AuthorizationType
+    {
+        public const string Basic = "basic";
+        public const string Bearer = "Bearer";
+    }
+}

@@ -1,11 +1,13 @@
 using Healthcare.Domain.Shared;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Contracts;
 
 namespace WebApi.Infrastructure;
 
 [ApiController]
+[Authorize]
 public class ApiController : ControllerBase
 {
     protected readonly ISender Sender;
