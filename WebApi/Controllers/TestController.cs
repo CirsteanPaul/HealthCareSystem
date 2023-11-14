@@ -1,7 +1,8 @@
+using DevOne.Security.Cryptography.BCrypt;
 using Healthcare.Application.Core.Abstractions.Authentication;
 using Healthcare.Application.Test.Commands;
 using Healthcare.Application.Test.Queries;
-using Healthcare.Domain.Shared;
+using Healthcare.Domain.Shared.Results;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -41,19 +42,11 @@ public class TestController : ApiController
 
         return result.Match<GetTestResponse, IActionResult>(Ok, HandleFailure);
     }
-
-    [AllowAnonymous]
-    [HttpGet("token")]
-    public async Task<IActionResult> Login(string username)
-    {
-        var token = _jwtProvider.Create(username);
-        
-        return Ok(token);
-    }
     
     [HttpGet("username")]
     public async Task<IActionResult> GetUsername(string token)
     {
+        return Ok(BCryptHelper.GenerateSalt());
         return Ok(_identityProvider.UserId);
     }
 }

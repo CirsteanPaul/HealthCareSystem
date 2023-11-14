@@ -1,5 +1,4 @@
-﻿
-namespace Healthcare.Domain.Shared;
+﻿namespace Healthcare.Domain.Shared.Results;
 
 public class Result
 {
@@ -29,9 +28,9 @@ public class Result
         where TValue : class
         => value is null ? Failure<TValue>(error) : Success(value);
     
-    public static Result Failure(Error error) => new Result(false, error);
+    public static Result Failure(Error error) => new(false, error);
     
-    public static Result<TValue> Failure<TValue>(Error error) => new Result<TValue>(default!, false, error);
+    public static Result<TValue> Failure<TValue>(Error error) => new(default!, false, error);
     
     public static Result FirstFailureOrSuccess(params Result[] results)
     {

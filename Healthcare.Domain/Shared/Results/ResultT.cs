@@ -1,4 +1,4 @@
-namespace Healthcare.Domain.Shared;
+namespace Healthcare.Domain.Shared.Results;
 
 public class Result<TValue> : Result
 {

@@ -1,6 +1,10 @@
+using Healthcare.Domain.Entities;
+
 namespace Healthcare.Application.Core.Abstractions.Authentication;
 
 public interface IUserIdentityProvider
 { 
-    string UserId { get; }
+    Guid UserId { get; }
+    string Email { get; }
+    UserPermission UserPermission { get; }
 }

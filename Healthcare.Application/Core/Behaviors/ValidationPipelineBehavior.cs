@@ -1,5 +1,6 @@
 using FluentValidation;
 using Healthcare.Domain.Shared;
+using Healthcare.Domain.Shared.Results;
 using MediatR;
 
 namespace Healthcare.Application.Core.Behaviors;

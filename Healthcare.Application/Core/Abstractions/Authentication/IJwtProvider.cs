@@ -1,6 +1,8 @@
+using Healthcare.Domain.Entities;
+
 namespace Healthcare.Application.Core.Abstractions.Authentication;
 
 public interface IJwtProvider
 {
-    string Create(string user);
+    string Create(Guid userId, string email, UserPermission userPermission);
 }
