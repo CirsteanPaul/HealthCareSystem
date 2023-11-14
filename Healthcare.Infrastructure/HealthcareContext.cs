@@ -7,18 +7,12 @@ namespace Healthcare.Infrastructure;
 public class HealthcareContext : DbContext
 {
     public DbSet<Test> Tests { get; set; }
+    public DbSet<User> Users { get; set; }
    
     public HealthcareContext(DbContextOptions options)
         : base(options)
     {
     }
-    
-    
-    // protected override void OnConfiguring(DbContextOptionsBuilder options)
-    // {
-    //     options.UseNpgsql(
-    //         "USER ID=paul;Password=Complicated;HOST=localhost;PORT=5432;Database=Healthcare;Pooling=true;"));
-    // }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,3 +21,21 @@ public class HealthcareContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 }
+
+// public class BloggingContextFactory : IDesignTimeDbContextFactory<HealthcareContext>
+// {
+//     private readonly string? _connectionString;
+//     public BloggingContextFactory(string? connectionString)
+//     {
+//         _connectionString = connectionString;
+//     }
+//     
+//     public BloggingContextFactory() { }
+//     public HealthcareContext CreateDbContext(string[] args)
+//     {
+//         var optionsBuilder = new DbContextOptionsBuilder<HealthcareContext>();
+//         optionsBuilder.UseNpgsql(_connectionString);
+//
+//         return new HealthcareContext(optionsBuilder.Options);
+//     }
+// }

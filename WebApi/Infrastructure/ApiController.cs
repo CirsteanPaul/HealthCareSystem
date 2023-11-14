@@ -1,8 +1,9 @@
+using Healthcare.Domain.Errors;
 using Healthcare.Domain.Shared;
+using Healthcare.Domain.Shared.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Contracts;
 
 namespace WebApi.Infrastructure;
 
@@ -16,6 +17,9 @@ public class ApiController : ControllerBase
     {
         Sender = sender;
     }
+
+    protected IActionResult Created() => StatusCode(201);
+    protected IActionResult Created<TIn>(TIn result) => StatusCode(201, result);
     
     protected IActionResult HandleFailure<TIn>(Result<TIn> result) =>
         result switch
@@ -34,6 +38,7 @@ public class ApiController : ControllerBase
             IValidationResult validationResult =>
                 BadRequest(CreateProblemDetails("Validation Error", StatusCodes.Status400BadRequest,
                     result.Error, validationResult.Errors)),
+            { IsSuccess: false, Error: {Code: DomainErrors.General.ForbiddenCode }} => Forbid(),
             _ => BadRequest(CreateProblemDetails("Bad request", StatusCodes.Status400BadRequest, result.Error))
         };
 

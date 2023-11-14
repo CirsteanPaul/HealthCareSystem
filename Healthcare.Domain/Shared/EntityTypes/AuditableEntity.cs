@@ -1,4 +1,4 @@
-﻿namespace Healthcare.Domain.Shared;
+﻿namespace Healthcare.Domain.Shared.EntityTypes;
 
 public class AuditableEntity
 {

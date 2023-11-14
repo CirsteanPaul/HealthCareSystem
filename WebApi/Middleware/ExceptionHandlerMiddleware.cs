@@ -47,7 +47,7 @@ namespace WebApi.Middleware;
                 Detail = DomainErrors.General.InternalServerError.Message
             };
 
-            string response = JsonSerializer.Serialize(problemDetails, serializerOptions);
+            var response = JsonSerializer.Serialize(problemDetails, serializerOptions);
 
             await httpContext.Response.WriteAsync(response);
         }

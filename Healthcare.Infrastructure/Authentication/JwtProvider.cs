@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Healthcare.Application.Core.Abstractions.Authentication;
+using Healthcare.Domain.Entities;
 using Healthcare.Infrastructure.Authentication.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -17,7 +18,7 @@ public class JwtProvider : IJwtProvider
         _jwtSettings = jwtOptions.Value;
     }
     
-    public string Create(string user)
+    public string Create(Guid userId, string email, UserPermission userPermission)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
 
@@ -25,10 +26,12 @@ public class JwtProvider : IJwtProvider
 
         Claim[] claims = 
         {
-            new Claim("userId", user),
+            new Claim("userId", userId.ToString()),
+            new Claim("email_address", email),
+            new Claim("user_permission", ((int)userPermission).ToString())
         };
 
-        DateTime tokenExpirationTime = DateTime.UtcNow.AddMinutes(_jwtSettings.TokenLifetimeSeconds);
+        var tokenExpirationTime = DateTime.UtcNow.AddMinutes(_jwtSettings.TokenLifetimeSeconds);
 
         var token = new JwtSecurityToken(
             _jwtSettings.Issuer,
@@ -38,7 +41,7 @@ public class JwtProvider : IJwtProvider
             tokenExpirationTime,
             signingCredentials);
 
-        string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
+        var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
 
         return tokenValue;
     }

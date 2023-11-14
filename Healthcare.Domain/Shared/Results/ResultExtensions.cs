@@ -1,10 +1,10 @@
-namespace Healthcare.Domain.Shared;
+namespace Healthcare.Domain.Shared.Results;
 
 public static class ResultExtensions
 {
-    public static T Match<T>(this Result result, Func<Result, T> onSuccess, Func<Result, T> onFailure)
+    public static T Match<T>(this Result result, Func<T> onSuccess, Func<Result, T> onFailure)
     {
-        return result.IsSuccess ? onSuccess(result) : onFailure(result);
+        return result.IsSuccess ? onSuccess() : onFailure(result);
     }
     
     public static TOut Match<TIn, TOut>(

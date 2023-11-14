@@ -1,6 +1,6 @@
 using Healthcare.Application.Core.Abstractions.Data;
 using Healthcare.Application.Core.Abstractions.Messaging;
-using Healthcare.Domain.Shared;
+using Healthcare.Domain.Shared.Results;
 
 namespace Healthcare.Application.Test.Commands;
 

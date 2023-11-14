@@ -1,5 +1,6 @@
 using Healthcare.Application.Core.Abstractions.Data;
-using Healthcare.Domain.Shared;
+using Healthcare.Domain.Errors;
+using Healthcare.Domain.Shared.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Infrastructure.Repositories;
@@ -20,13 +21,13 @@ public class AsyncRepository<TEntity> : IAsyncRepository<TEntity> where TEntity 
     public virtual async Task<Result<TEntity>> DeleteAsync(Guid id)
     {
         var result = await FindByIdAsync(id);
-        if (result != null)
+        if (result.IsSuccess)
         {
             context.Set<TEntity>().Remove(result.Value);
             await context.SaveChangesAsync();
             return result;
         }
-        return Result.Failure<TEntity>(new Error("Persistance error", "No id found"));
+        return Result.Failure<TEntity>(DomainErrors.General.EntityNotFoundError);
     }
 
     public virtual async Task<Result<TEntity>> FindByIdAsync(Guid id)
@@ -34,7 +35,7 @@ public class AsyncRepository<TEntity> : IAsyncRepository<TEntity> where TEntity 
         var result = await context.Set<TEntity>().FindAsync(id);
         if (result == null)
         {
-            return Result.Failure<TEntity>(new Error("Persistance error", "No id found"));
+            return Result.Failure<TEntity>(DomainErrors.General.EntityNotFoundError);
         }
         return result;
     }

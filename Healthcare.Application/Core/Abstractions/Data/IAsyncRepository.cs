@@ -1,4 +1,4 @@
-using Healthcare.Domain.Shared;
+using Healthcare.Domain.Shared.Results;
 
 namespace Healthcare.Application.Core.Abstractions.Data;
 
