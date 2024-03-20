@@ -1,8 +1,10 @@
 using DevOne.Security.Cryptography.BCrypt;
 using Healthcare.Application.Core.Abstractions.Authentication;
+using Healthcare.Application.Core.Abstractions.Email;
 using Healthcare.Application.Test.Commands;
 using Healthcare.Application.Test.Queries;
 using Healthcare.Domain.Shared.Results;
+using Healthcare.Infrastructure.Emails;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -17,11 +19,13 @@ public class TestController : ApiController
     private readonly IMapper _mapper;
     private readonly IJwtProvider _jwtProvider;
     private readonly IUserIdentityProvider _identityProvider;
-    public TestController(ISender sender, IMapper mapper, IJwtProvider jwtProvider, IUserIdentityProvider identityProvider) : base(sender)
+    private readonly IEmailSmtp _emailSmtp;
+    public TestController(ISender sender, IMapper mapper, IJwtProvider jwtProvider, IUserIdentityProvider identityProvider, IEmailSmtp emailSmtp) : base(sender)
     {
         _mapper = mapper;
         _jwtProvider = jwtProvider;
         _identityProvider = identityProvider;
+        _emailSmtp = emailSmtp;
     }
 
     [AllowAnonymous]
@@ -48,5 +52,15 @@ public class TestController : ApiController
     {
         return Ok(BCryptHelper.GenerateSalt());
         return Ok(_identityProvider.UserId);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("email")]
+    public async Task<IActionResult> SendEmail()
+    {
+        var email = new MailRequest("paul3ioan@gmail.com", "Test123", "Mesaj important");
+        await _emailSmtp.SendEmailAsync(email);
+
+        return Ok();
     }
 }

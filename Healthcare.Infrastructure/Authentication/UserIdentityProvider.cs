@@ -1,21 +1,32 @@
 using System.Security.Claims;
 using Healthcare.Application.Core.Abstractions.Authentication;
+using Healthcare.Application.Core.Abstractions.Data;
 using Healthcare.Domain.Entities;
+using Healthcare.Domain.Errors;
+using Healthcare.Domain.Shared.Results;
 using Microsoft.AspNetCore.Http;
 
 namespace Healthcare.Infrastructure.Authentication;
 
-public class UserIdentityProvider : IUserIdentityProvider
+public class UserIdentityProvider : IUserIdentityProvider, IIdentityService
 {
-    public UserIdentityProvider(IHttpContextAccessor httpContextAccessor)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUserRepository _userRepository;
+
+    public UserIdentityProvider(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository)
     {
-        var userIdClaim = httpContextAccessor.HttpContext?.User?.FindFirstValue("userId")
+        _httpContextAccessor = httpContextAccessor;
+        _userRepository = userRepository;
+    }
+
+    public async Task<Result<UserPermission>> ValidateJwt()
+    {
+        var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirstValue("userId")
+                          ?? string.Empty;
+        var emailClaim = _httpContextAccessor.HttpContext?.User?.FindFirstValue("email_address")
                              ?? string.Empty;
-        var emailClaim = httpContextAccessor.HttpContext?.User?.FindFirstValue("email_address")
-                             ?? string.Empty;
-        var userPermissionClaim = httpContextAccessor.HttpContext?.User?.FindFirstValue("user_permission") 
+        var userPermissionClaim = _httpContextAccessor.HttpContext?.User?.FindFirstValue("user_permission") 
                                   ?? string.Empty;
-        UserId = Guid.Empty;
         
         if (Guid.TryParse(userIdClaim, out var guid))
         {
@@ -24,14 +35,32 @@ public class UserIdentityProvider : IUserIdentityProvider
         
         Email = emailClaim;
         
-        UserPermission = UserPermission.Unknown;
         if (int.TryParse(userPermissionClaim, out var result))
         {
             UserPermission = (UserPermission)result;
         }
+
+        if (UserId == Guid.Empty || Email == string.Empty || UserPermission == UserPermission.Unknown)
+        {
+            return Result.Failure<UserPermission>(DomainErrors.General.InternalServerError);
+        }
+
+        var userResult = await _userRepository.FindByIdAsync(UserId);
+        
+        if (userResult.IsFailure)
+        {
+            return Result.Failure<UserPermission>(DomainErrors.General.InternalServerError);
+        }
+        
+        if (userResult.Value.UserPermission != UserPermission)
+        {
+            return Result.Failure<UserPermission>(DomainErrors.General.InternalServerError);
+        }
+
+        return UserPermission;
     }
-    
-    public Guid UserId { get; }
-    public string Email { get; }
-    public UserPermission UserPermission { get; }
+
+    public Guid UserId { get; private set; } = Guid.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public UserPermission UserPermission { get; private set; } = UserPermission.Unknown;
 }

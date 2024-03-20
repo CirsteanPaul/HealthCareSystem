@@ -2,9 +2,12 @@ namespace WebApi.Contracts;
 
 public static class ApiRoutes
 {
+    public static class Identity
+    {
+        public const string Login = "/api/identity/login";
+    }
     public static class User
     {
-        public const string Login = "/api/user/login";
         public const string ChangeDetails = "/api/user";
         public const string ChangePassword = "/api/user/password";
     }
@@ -18,5 +21,10 @@ public static class ApiRoutes
     {
         public const string CreateEmployee = "/api/admin/employee";
         public const string DeleteEmployee = "/api/admin/employee";
+    }
+
+    public static class Registratur
+    {
+        public const string CreateUser = "/api/registratur/create-user";
     }
 }

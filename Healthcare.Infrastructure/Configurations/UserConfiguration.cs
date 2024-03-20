@@ -25,8 +25,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                 .HasMaxLength(Email.MaxLength)
                 .IsRequired();
         });
-
-        // builder.HasIndex(u => u.Cnp).IsUnique();
         
         builder.OwnsOne(u => u.Cnp, cnpBuilder =>
         {

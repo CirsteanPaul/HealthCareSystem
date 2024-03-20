@@ -2,6 +2,7 @@ namespace Healthcare.Domain.Shared.Results;
 
 public static class ResultExtensions
 {
+    
     public static T Match<T>(this Result result, Func<T> onSuccess, Func<Result, T> onFailure)
     {
         return result.IsSuccess ? onSuccess() : onFailure(result);

@@ -1,5 +1,6 @@
-using Healthcare.Application.Admin.CreateEmployee;
-using Healthcare.Application.Admin.DeleteEmployee;
+using Healthcare.Application.Features.Admin.CreateEmployee;
+using Healthcare.Application.Features.Admin.DeleteEmployee;
+using Healthcare.Domain.Entities;
 using Healthcare.Domain.Shared.Results;
 using MapsterMapper;
 using MediatR;
@@ -9,6 +10,7 @@ using WebApi.Infrastructure;
 
 namespace WebApi.Controllers.Admin;
 
+[ShouldHaveRole(Role = nameof(UserPermission.Admin))]
 public class AdminController : ApiController
 {
     private readonly IMapper _mapper;
@@ -19,7 +21,7 @@ public class AdminController : ApiController
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
@@ -45,6 +47,6 @@ public class AdminController : ApiController
 
         var result = await Sender.Send(command);
         
-        return result.Match(Ok, HandleFailure);
+        return result.Match(NoContent, HandleFailure);
     }
 }

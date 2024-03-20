@@ -2,13 +2,18 @@ using System.Text;
 using Healthcare.Application.Core.Abstractions.Authentication;
 using Healthcare.Application.Core.Abstractions.Cryptography;
 using Healthcare.Application.Core.Abstractions.Data;
+using Healthcare.Application.Core.Abstractions.Email;
+using Healthcare.Application.Core.Abstractions.Messaging;
+using Healthcare.Application.Core.Notifications;
 using Healthcare.Infrastructure.Authentication;
 using Healthcare.Infrastructure.Authentication.Settings;
 using Healthcare.Infrastructure.Cryptography;
+using Healthcare.Infrastructure.Emails;
+using Healthcare.Infrastructure.Messaging;
+using Healthcare.Infrastructure.Notifications;
 using Healthcare.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -22,26 +27,48 @@ public static class DependencyMapper
         var connectionString = configuration.GetConnectionString("HealthCareDb");
         
         services.AddHttpContextAccessor();
-        services.AddAuthentication(configuration);
         
+        services.AddOptions<MessageBrokerSettings>()
+            .Bind(configuration.GetSection(MessageBrokerSettings.SettingsKey))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        services.AddOptions<MailSettings>()
+            .Bind(configuration.GetSection(MailSettings.SettingsKey))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddScoped<IIntegrationEventPublisher, IntegrationEventPublisher>();
+
+        services.AddScoped<IEmailSmtp, EmailSmtp>();
+
+        services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+        services.AddScoped<IJwtProvider, JwtProvider>();
+        services.AddScoped<UserIdentityProvider>();
+        services.AddScoped<IUserIdentityProvider>(provider => provider.GetRequiredService<UserIdentityProvider>());
+        services.AddScoped<IIdentityService>(provider => provider.GetRequiredService<UserIdentityProvider>());
+
+        services.AddDbContext<HealthcareContext>(o => o.UseNpgsql(connectionString));
+        services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+        services.AddScoped<ITestRepository, TestRepository>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IMedicalReportRepository, MedicalReportRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IInvestigationRepository, InvestigationRepository>();
+        services.AddScoped<IInvestigationTypeRepository, InvestigationTypeRepository>();
+        services.AddScoped<IMedicalReportRepository, MedicalReportRepository>();
+        services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
+        return services;
+    }
+
+    public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
         // options validations
         services.AddOptions<JwtSettings>()
             .Bind(configuration.GetSection(JwtSettings.SettingsKey))
             .ValidateDataAnnotations()
             .ValidateOnStart();
-
-        services.AddScoped<IJwtProvider, JwtProvider>();
-        services.AddScoped<IUserIdentityProvider, UserIdentityProvider>();
-
-        services.AddDbContext<HealthcareContext>(o => o.UseNpgsql(connectionString));
-        services.AddScoped<ITestRepository, TestRepository>();
-        services.AddScoped<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        return services;
-    }
-
-    private static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
-    {
+        
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
             {

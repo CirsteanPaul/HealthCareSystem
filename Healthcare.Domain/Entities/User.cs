@@ -11,9 +11,10 @@ public enum UserPermission
     Doctor,
     Pharmacist,
     Registratur,
-    Patient, 
+    Patient,
     Unknown = 1001
 }
+
 public class User : AggregateRoot
 {
     private string _hashedPassword;
@@ -24,9 +25,10 @@ public class User : AggregateRoot
 
     private User()
     {
-        
     }
-    private User(Guid id, Cnp cnp, string hashedPassword, Email email, PhoneNumber phoneNumber, UserPermission userPermission) : base(id)
+
+    private User(Guid id, Cnp cnp, string hashedPassword, Email email, PhoneNumber phoneNumber,
+        UserPermission userPermission) : base(id)
     {
         Cnp = cnp;
         _hashedPassword = hashedPassword;
@@ -35,27 +37,24 @@ public class User : AggregateRoot
         UserPermission = userPermission;
     }
 
-    public static Result<User> Create(string cnp, string hashedPassword, string email, string phoneNumber, UserPermission userPermission)
+    public static Result<User> Create(string cnp, string hashedPassword, string email, string phoneNumber,
+        UserPermission userPermission)
     {
         var cnpResult = Cnp.Create(cnp);
         var emailResult = Email.Create(email);
         var phoneNumberResult = PhoneNumber.Create(phoneNumber);
 
-        var validationResult = ValidationResult<User>.AggregateValidationResults(emailResult, phoneNumberResult);
+        var validationResult = ValidationResult<User>.AggregateValidationResults(cnpResult, emailResult, phoneNumberResult);
         if (validationResult.IsFailure)
         {
             return validationResult;
         }
-        if (cnpResult.IsFailure || emailResult.IsFailure || phoneNumberResult.IsFailure)
-        {
-            return ValidationResult<User>.WithErrors(new []{ cnpResult.Error, emailResult.Error, phoneNumberResult.Error });
-        }
 
-        var user = new User (
-            Guid.NewGuid(), 
-            cnpResult.Value, 
-            hashedPassword, 
-            emailResult.Value, 
+        var user = new User(
+            Guid.NewGuid(),
+            cnpResult.Value,
+            hashedPassword,
+            emailResult.Value,
             phoneNumberResult.Value,
             userPermission);
 
@@ -69,28 +68,19 @@ public class User : AggregateRoot
     public void ChangePassword(string hashedPassword)
     {
         _hashedPassword = hashedPassword;
-        
+
         AddDomainEvent(new ChangedPasswordUserDomainEvent(this));
     }
-    
-    public Result ChangeDetails(string email, string phoneNumber)
+
+    public void ChangeDetails(string email, string phoneNumber)
     {
         // TODO: We need email verification step.
         var emailResult = Email.Create(email);
         var phoneNumberResult = PhoneNumber.Create(phoneNumber);
 
-        var validationResult = ValidationResult.AggregateValidationResults(emailResult, phoneNumberResult);
-        if (validationResult.IsFailure)
-        {
-            return validationResult;
-        }
-        
         Email = emailResult.Value;
         PhoneNumber = phoneNumberResult.Value;
-        
-        AddDomainEvent(new ChangedDetailsUserDomainEvent(this));
 
-        return Result.Success();
+        AddDomainEvent(new ChangedDetailsUserDomainEvent(this));
     }
-    
 }

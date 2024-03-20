@@ -30,7 +30,6 @@ public class ApiController : ControllerBase
                     result.Error, validationResult.Errors)),
             _ => BadRequest(CreateProblemDetails("Bad request", StatusCodes.Status400BadRequest, result.Error))
         };
-    
     protected IActionResult HandleFailure(Result result) =>
         result switch
         {
@@ -38,7 +37,7 @@ public class ApiController : ControllerBase
             IValidationResult validationResult =>
                 BadRequest(CreateProblemDetails("Validation Error", StatusCodes.Status400BadRequest,
                     result.Error, validationResult.Errors)),
-            { IsSuccess: false, Error: {Code: DomainErrors.General.ForbiddenCode }} => Forbid(),
+            { IsSuccess: false, Error: { Code: DomainErrors.General.ForbiddenCode }} => Forbid(),
             _ => BadRequest(CreateProblemDetails("Bad request", StatusCodes.Status400BadRequest, result.Error))
         };
 
